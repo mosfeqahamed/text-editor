@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rich Text Editor</title>
+
+  <!-- Quill 1.3.7 -->
+  <link rel="stylesheet" href="https://cdn.quilljs.com/1.3.7/quill.snow.css" />
+
+  <!-- App styles -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ── Header ─────────────────────────────────────────────────────── -->
+  <header id="app-header">
+    <div id="header-left">
+      <span id="app-logo">✏</span>
+      <span id="app-title">Rich Text Editor</span>
+      <span id="doc-name">Untitled</span>
+    </div>
+    <div id="header-right">
+      <button class="hdr-btn" id="btn-new">New</button>
+      <button class="hdr-btn" id="btn-open">Open</button>
+      <button class="hdr-btn primary" id="btn-save">Save</button>
+    </div>
+  </header>
+
+  <!-- ── Row 1: Formatting toolbar (Quill-managed) ────────────────── -->
+  <div id="toolbar">
+
+    <!-- Font family -->
+    <select class="ql-font" title="Font Family">
+      <option value="georgia"         selected>Georgia</option>
+      <option value="arial"                   >Arial</option>
+      <option value="times-new-roman"         >Times New Roman</option>
+      <option value="courier-new"             >Courier New</option>
+      <option value="verdana"                 >Verdana</option>
+      <option value="trebuchet-ms"            >Trebuchet MS</option>
+    </select>
+
+    <!-- Font size -->
+    <select class="ql-size" title="Font Size">
+      <option value="10px">10</option>
+      <option value="12px">12</option>
+      <option value="14px" selected>14</option>
+      <option value="16px">16</option>
+      <option value="18px">18</option>
+      <option value="20px">20</option>
+      <option value="24px">24</option>
+      <option value="28px">28</option>
+      <option value="32px">32</option>
+      <option value="36px">36</option>
+      <option value="48px">48</option>
+    </select>
+
+    <span class="tb-sep"></span>
+
+    <!-- Bold / Italic / Underline -->
+    <button class="ql-bold"      title="Bold"></button>
+    <button class="ql-italic"    title="Italic"></button>
+    <button class="ql-underline" title="Underline"></button>
+
+    <span class="tb-sep"></span>
+
+    <!-- Highlight swatches -->
+    <span class="tb-label">Highlight</span>
+    <button class="ql-background swatch" value="#fef08a" title="Yellow" style="background:#fef08a"></button>
+    <button class="ql-background swatch" value="#bbf7d0" title="Green"  style="background:#bbf7d0"></button>
+    <button class="ql-background swatch" value="#bae6fd" title="Blue"   style="background:#bae6fd"></button>
+    <button class="ql-background swatch" value="#fecdd3" title="Pink"   style="background:#fecdd3"></button>
+    <button class="ql-background swatch" value="#fed7aa" title="Orange" style="background:#fed7aa"></button>
+    <button class="swatch clear-swatch" id="btn-clear-hl" title="Clear highlight">✕</button>
+
+  </div>
+
+  <!-- ── Row 2: Media insert bar ───────────────────────────────────── -->
+  <div id="media-bar">
+    <span class="mb-label">Insert</span>
+    <button class="media-btn audio-btn" id="btn-audio">♪ &nbsp;Audio</button>
+    <button class="media-btn video-btn" id="btn-video">🎬 &nbsp;Video</button>
+    <button class="media-btn yt-btn"    id="btn-youtube">▶ &nbsp;YouTube</button>
+    <button class="media-btn image-btn" id="btn-image">🖼 &nbsp;Image</button>
+  </div>
+
+  <!-- ── Editor ─────────────────────────────────────────────────────── -->
+  <div id="editor-wrapper">
+    <div id="editor"></div>
+  </div>
+
+  <!-- ── Status bar ─────────────────────────────────────────────────── -->
+  <div id="status-bar">Ready</div>
+
+  <!-- ── Hidden file inputs ─────────────────────────────────────────── -->
+  <input type="file" id="audio-input" accept="audio/*" hidden />
+  <input type="file" id="video-input" accept="video/*" hidden />
+  <input type="file" id="image-input" accept="image/*" hidden />
+
+  <!-- ── YouTube modal ──────────────────────────────────────────────── -->
+  <div class="modal-overlay" id="yt-modal" hidden>
+    <div class="modal">
+      <h2>Embed YouTube Video</h2>
+      <input type="text" id="yt-url-input" placeholder="https://www.youtube.com/watch?v=..." />
+      <div class="modal-actions">
+        <button class="btn-confirm" id="yt-confirm">Embed</button>
+        <button class="btn-cancel"  id="yt-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Save-as modal ──────────────────────────────────────────────── -->
+  <div class="modal-overlay" id="saveas-modal" hidden>
+    <div class="modal">
+      <h2>Save Document</h2>
+      <input type="text" id="saveas-input" placeholder="Document name…" />
+      <div class="modal-actions">
+        <button class="btn-confirm" id="saveas-confirm">Save</button>
+        <button class="btn-cancel"  id="saveas-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Open modal ─────────────────────────────────────────────────── -->
+  <div class="modal-overlay" id="open-modal" hidden>
+    <div class="modal">
+      <h2>Open Document</h2>
+      <ul id="doc-list"></ul>
+      <div class="modal-actions">
+        <button class="btn-cancel" id="open-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Toast ──────────────────────────────────────────────────────── -->
+  <div id="toast" hidden></div>
+
+  <!-- Quill JS -->
+  <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+
+  <!-- App JS -->
+  <script src="js/blots.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
