@@ -2,7 +2,8 @@
  * api.js — All fetch calls to the FastAPI backend.
  */
 
-const API = 'http://localhost:8000';
+// Local dev → backend runs on :8000. Vercel → same origin, no prefix needed.
+const API = window.location.hostname === 'localhost' ? 'http://localhost:8000' : '';
 
 async function _handleResponse(res) {
   if (!res.ok) {
